@@ -11,8 +11,7 @@
   [user]
   (p/-> (fetch/post "http://localhost:3000/api/auth/login"
                     {:body user,
-                     :headers {:with-credentials true,
-                               :credentials "include"}})
+                     :credentials :include})
         (js->clj :keywordize-keys true)
         (println)))
 
@@ -20,9 +19,10 @@
   []
   (let [[user set-user] (hooks/use-state {:email "" :password ""})]
     (<>
-     (d/form {:on-submit (fn [event]
-                           (.preventDefault event)
-                           (sign-in user))}
+     (d/form {:on-submit
+              (fn [event]
+                (.preventDefault event)
+                (sign-in user))}
              (d/label "Email")
              (d/input {:value (:email user)
                        :on-change #(set-user assoc :email (.. % -target -value))})
@@ -42,12 +42,13 @@
 (defnc users-list []
   (let [[users set-users] (hooks/use-state {})
         _ (hooks/use-effect
-           :once
-           (p/-> (fetch/get "http://localhost:3000/api/admin/users" {:accept :json
-                                                                     :content-type :json})
-                 (:body)
-                 (js->clj :keywordize-keys true)
-                 set-users))]
+            :once
+            (p/let [_res (fetch/get "http://localhost:3000/api/admin/users" {:accept :json
+                                                                             :content-type :json
+                                                                             :credentials :include})
+                    body (:body _res)
+                    _users (js->clj body :keywordize-keys true)]
+              (set-users _users)))]
     (<>
      (if (:users users)
        (d/ul
@@ -66,7 +67,6 @@
 
 ;; start your app with your favorite React renderer
 (defonce root (rdom/createRoot (js/document.getElementById "app")))
-
 
 (defn ^:export init
   []

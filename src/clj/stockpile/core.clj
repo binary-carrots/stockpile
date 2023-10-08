@@ -1,30 +1,32 @@
 (ns stockpile.core
   (:gen-class)
-  (:require [clojure.pprint]
-            [jdbc-ring-session.cleaner :refer
+  (:require
+   [clojure.pprint]
+   [jdbc-ring-session.cleaner :refer
              [start-cleaner stop-cleaner]]
-            [jdbc-ring-session.core :refer [jdbc-store]]
-            [muuntaja.core :as m]
-            [reitit.coercion.schema]
-            [reitit.ring :as ring]
-            [reitit.ring.coercion :refer
+   [jdbc-ring-session.core :refer [jdbc-store]]
+   [muuntaja.core :as m]
+   [reitit.coercion.schema]
+   [reitit.ring :as ring]
+   [reitit.ring.coercion :refer
              [coerce-exceptions-middleware coerce-request-middleware
               coerce-response-middleware]]
-            [reitit.ring.middleware.exception :refer
+   [reitit.ring.middleware.exception :refer
              [exception-middleware]]
-            [reitit.ring.middleware.muuntaja :refer
+   [reitit.ring.middleware.muuntaja :refer
              [format-negotiate-middleware format-request-middleware
               format-response-middleware]]
-            [ring.adapter.jetty :refer [run-jetty]]
-            [ring.middleware.cors :refer [wrap-cors]]
-            [ring.middleware.reload :refer [wrap-reload]]
-            [ring.middleware.session :refer
+   [ring.adapter.jetty :refer [run-jetty]]
+   [ring.middleware.cookies]
+   [ring.middleware.cors :refer [wrap-cors]]
+   [ring.middleware.reload :refer [wrap-reload]]
+   [ring.middleware.session :refer
              [wrap-session]]
-            [ring.middleware.session-timeout :refer
+   [ring.middleware.session-timeout :refer
              [wrap-idle-session-timeout]]
-            [stockpile.db :refer [mysql-db]]
-            [stockpile.handlers :as handle]
-            [stockpile.routes :refer [api-routes]]))
+   [stockpile.db :refer [mysql-db]]
+   [stockpile.handlers :as handle]
+   [stockpile.routes :refer [api-routes]]))
 
 (def app
   (ring/ring-handler
@@ -39,14 +41,18 @@
       :middleware
       ;; Middleware chain runs from bottom to
       ;; top
-      [[wrap-session {:store (jdbc-store mysql-db)}]
+
+      [[wrap-session
+        {:cookie-attrs {:secure true
+                        :same-site :none},
+         :store (jdbc-store mysql-db)}]
        [wrap-idle-session-timeout
         {:timeout-handler handle/timeout,
          :timeout 600}]
        [wrap-cors
-        :access-control-allow-origin [#".*"]
+        :access-control-allow-origin #"http://localhost:5003"
         :access-control-allow-credentials "true"
-        :access-control-allow-methods [:get :post :put :delete :options]]
+        :access-control-allow-methods [:get :post :put :delete]]
        format-negotiate-middleware
        format-response-middleware
        exception-middleware
@@ -91,3 +97,4 @@
 (comment
   (start-server)
   (stop-server))
+

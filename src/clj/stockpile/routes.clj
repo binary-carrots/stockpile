@@ -1,9 +1,9 @@
 (ns stockpile.routes
-  (:require [stockpile.handlers :as handle]
-            [schema.core :as s]
-            [ring.middleware.cors :refer [wrap-cors]]
-            [stockpile.auth :refer
-             [wrap-auth wrap-auth-admin]]))
+  (:require
+   [schema.core :as s]
+   [stockpile.auth :refer
+    [wrap-auth wrap-auth-admin]]
+   [stockpile.handlers :as handle]))
 
 (def users-routes
   ["/users" {:name ::users}
@@ -42,4 +42,5 @@
      :post {:handler handle/logout}}]])
 
 (def api-routes
-  ["/api" {:name ::api} admin-routes auth-routes])
+  ["/api" {:name ::api}
+   admin-routes auth-routes])
