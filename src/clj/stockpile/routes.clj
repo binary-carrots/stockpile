@@ -1,6 +1,7 @@
 (ns stockpile.routes
   (:require [stockpile.handlers :as handle]
             [schema.core :as s]
+            [ring.middleware.cors :refer [wrap-cors]]
             [stockpile.auth :refer
              [wrap-auth wrap-auth-admin]]))
 

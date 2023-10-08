@@ -10,7 +10,9 @@
 (defn sign-in
   [user]
   (p/-> (fetch/post "http://localhost:3000/api/auth/login"
-                    {:body user})
+                    {:body user,
+                     :headers {:with-credentials true,
+                               :credentials "include"}})
         (js->clj :keywordize-keys true)
         (println)))
 
@@ -18,15 +20,17 @@
   []
   (let [[user set-user] (hooks/use-state {:email "" :password ""})]
     (<>
-     (d/div
-      (d/label "Email")
-      (d/input {:value (:email user)
-                :on-change #(set-user assoc :email (.. % -target -value))})
-      (d/label "password")
-      (d/input {:value (:password user)
-                :type "password"
-                :on-change #(set-user assoc :password (.. % -target -value))})
-      (d/button {:on-click #(sign-in user)} "Sign in")))))
+     (d/form {:on-submit (fn [event]
+                           (.preventDefault event)
+                           (sign-in user))}
+             (d/label "Email")
+             (d/input {:value (:email user)
+                       :on-change #(set-user assoc :email (.. % -target -value))})
+             (d/label "password")
+             (d/input {:value (:password user)
+                       :type "password"
+                       :on-change #(set-user assoc :password (.. % -target -value))})
+             (d/button {:type "submit"} "Sign in")))))
 
 (defnc user-list-item [{:keys [user]}]
   (d/li
@@ -37,11 +41,13 @@
 
 (defnc users-list []
   (let [[users set-users] (hooks/use-state {})
-        _ (p/let [_res (fetch/get "http://localhost:3000/api/admin/users" {:accept :json
-                                                                           :content-type :json})
-                  body (:body _res)
-                  _users (js->clj body :keywordize-keys true)]
-            (set-users _users))]
+        _ (hooks/use-effect
+           :once
+           (p/-> (fetch/get "http://localhost:3000/api/admin/users" {:accept :json
+                                                                     :content-type :json})
+                 (:body)
+                 (js->clj :keywordize-keys true)
+                 set-users))]
     (<>
      (if (:users users)
        (d/ul

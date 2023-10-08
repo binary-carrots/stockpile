@@ -39,15 +39,14 @@
       :middleware
       ;; Middleware chain runs from bottom to
       ;; top
-      [[wrap-cors
-        :access-control-allow-origin #".*"
-        :access-control-allow-methods [:get :post :put :delete]]
-       [wrap-session
-        {:cookie-attrs {:secure true},
-         :store (jdbc-store mysql-db)}]
+      [[wrap-session {:store (jdbc-store mysql-db)}]
        [wrap-idle-session-timeout
         {:timeout-handler handle/timeout,
          :timeout 600}]
+       [wrap-cors
+        :access-control-allow-origin [#".*"]
+        :access-control-allow-credentials "true"
+        :access-control-allow-methods [:get :post :put :delete :options]]
        format-negotiate-middleware
        format-response-middleware
        exception-middleware
