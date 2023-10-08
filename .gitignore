@@ -1,0 +1,14 @@
+env.edn
+/.clj-kondo
+/.lsp
+/.cpcache
+/.nrepl-port
+/.calva/
+/node_modules/
+/.shadow-cljs/
+/resources/public/assets/
+js/
+cljs-runtime/
+target/
+classes/
+checkouts/
