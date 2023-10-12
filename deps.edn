@@ -1,11 +1,15 @@
-{:paths ["src/clj" "src/cljs" "resources"]
- :aliases {:server {:main-opts ["-m"
-                                "stockpile.core"]}
-           :cljs {:extra-deps {thheller/shadow-cljs {:mvn/version "2.25.7"}
-                               lilactown/helix {:mvn/version "0.1.10"}
-                               funcool/promesa {:mvn/version "11.0.678"}
-                               lambdaisland/fetch {:mvn/version "1.5.83"}
-                               org.clojure/clojurescript {:mvn/version "1.11.121"}}}}
+{:aliases
+ {:cljs
+  {:extra-deps
+   {com.fbeyer/refx {:mvn/version "0.0.49"},
+    funcool/promesa {:mvn/version "11.0.678"},
+    lambdaisland/fetch {:mvn/version "1.5.83"},
+    lilactown/helix {:mvn/version "0.1.10"},
+    org.clojure/clojurescript {:mvn/version
+                               "1.11.121"},
+    thheller/shadow-cljs {:mvn/version
+                          "2.25.7"}}},
+  :server {:main-opts ["-m" "stockpile.core"]}},
  :deps
  {buddy/buddy-hashers {:mvn/version "2.0.167"},
   com.github.seancorfield/honeysql {:mvn/version
@@ -14,11 +18,13 @@
                                      "1.3.894"},
   jdbc-ring-session/jdbc-ring-session
   {:mvn/version "1.5.3"},
-  ring/ring-session-timeout {:mvn/version "0.3.0"},
   metosin/muuntaja {:mvn/version "0.6.8"},
   metosin/reitit {:mvn/version "0.6.0"},
   mysql/mysql-connector-java {:mvn/version
                               "8.0.30"},
   org.clojure/clojure {:mvn/version "1.11.1"},
-  ring/ring {:mvn/version "1.10.0"}
-  ring-cors/ring-cors {:mvn/version "0.1.13"}}}
+  ring-cors/ring-cors {:mvn/version "0.1.13"},
+  ring/ring {:mvn/version "1.10.0"},
+  ring/ring-session-timeout {:mvn/version
+                             "0.3.0"}},
+ :paths ["src/clj" "src/cljs" "resources"]}
