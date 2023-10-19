@@ -31,11 +31,11 @@
   (fn [request]
     (if (is-admin? request)
       (handler request)
-      {:status 401, :body {:error "Not authurized"}})))
+      {:status 403, :body {:error "Not authurized"}})))
 
 (defn wrap-auth-editor
   [handler]
   (fn [request]
     (if (is-editor? request)
       (handler request)
-      {:status 401, :body {:error "Not authurized"}})))
+      {:status 403, :body {:error "Not authurized"}})))
